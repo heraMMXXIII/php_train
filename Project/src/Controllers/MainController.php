@@ -14,8 +14,17 @@ class MainController
 
     public function sayHello(string $name)
     {
-        $this->view->renderHtml('main/hello.php', ['name' => $name]);
+        $this->view->renderHtml('main/hello', ['name' => $name, 'title' => 'Страница приветствия']);
     }
+
+
+    // задание 2.1 
+    public function sayBye(string $name)
+    {
+        $data = ['name' => $name, 'title' => 'До свидания!']; 
+        $this->view->renderHtml('main/bye.php', $data); 
+    }
+
 
     public function main()
     {
@@ -25,4 +34,5 @@ class MainController
         ];
         $this->view->renderHtml('main/main.php', ['articles' => $articles]);
     }
+
 }
