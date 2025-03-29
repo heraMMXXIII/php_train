@@ -2,37 +2,25 @@
 
 namespace src\Controllers;
 use src\View\View;
+use src\Services\Db;
 
 class MainController
 {
     private $view;
-
+    private $db;
     public function __construct()
     {
         $this->view = new View(dirname(dirname(__DIR__)) . '/templates');
+        $this->db = new Db();
     }
 
     public function sayHello(string $name)
     {
-        $this->view->renderHtml('main/hello', ['name' => $name, 'title' => 'Страница приветствия']);
+        $this->view->renderHtml('main/hello', ['name' => $name]);
     }
 
-
-    // задание 2.1 
     public function sayBye(string $name)
     {
-        $data = ['name' => $name, 'title' => 'До свидания!']; 
-        $this->view->renderHtml('main/bye.php', $data); 
+        $this->view->renderHtml2('main/bye.php', ['name' => $name]);
     }
-
-
-    public function main()
-    {
-        $articles = [
-            'title' => 'Title 1',
-            'text' => 'Text 1',
-        ];
-        $this->view->renderHtml('main/main.php', ['articles' => $articles]);
-    }
-
 }

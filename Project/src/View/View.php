@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 namespace src\View;
 
@@ -15,5 +15,11 @@ class View{
         http_response_code($code);
         extract($vars);
         include $this->templatesPath.'/'.$templateName.'.php';
+    }
+
+    public function renderHtml2(string $templateName, $vars=[])
+    {
+        extract($vars);
+        include $this->templatesPath.'/'.$templateName;
     }
 }
