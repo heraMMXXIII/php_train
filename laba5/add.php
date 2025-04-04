@@ -1,13 +1,12 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once 'db.php';
-    
-    // Получаем данные из формы
+
     $surname = $_POST['surname'];
     $name = $_POST['name'];
     $phone = $_POST['phone'];
 
-    // Добавляем запись в базу данных
+
     $stmt = $pdo->prepare("INSERT INTO contacts (surname, name, phone) VALUES (?, ?, ?)");
     $stmt->execute([$surname, $name, $phone]);
 

@@ -70,3 +70,9 @@ th, td {
     display: flex;
     justify-content: space-around;
 }
+
+a.select {
+    text-decoration: underline;
+    font-weight: bold;
+    color: red;
+}

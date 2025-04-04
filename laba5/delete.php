@@ -1,11 +1,11 @@
 <?php
-require_once 'db.php'; // Подключаем файл с настройками базы данных
+require_once 'db.php';
 
-// Получаем все записи из базы данных
+
 $stmt = $pdo->query("SELECT * FROM contacts ORDER BY surname, name");
 $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Удаляем запись по id
+
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
     $stmt = $pdo->prepare("DELETE FROM contacts WHERE id = ?");

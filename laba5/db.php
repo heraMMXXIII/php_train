@@ -1,11 +1,13 @@
 <?php
-$dsn = 'mysql:host=localhost;dbname=contacts_db;charset=utf8';
-$username = 'root'; // Пользователь для подключения к БД
-$password = ''; // Пароль пользователя
+$host = 'localhost';
+$dbname = 'contacts_db';
+$username = 'root';
+$password = '';
 
 try {
-    $pdo = new PDO($dsn, $username, $password);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    echo 'Подключение не удалось: ' . $e->getMessage();
+    die("Ошибка подключения: " . $e->getMessage());
 }
 ?>

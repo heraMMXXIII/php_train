@@ -1,13 +1,12 @@
 <?php
-require_once 'db.php'; // Подключаем файл с настройками базы данных
+require_once 'db.php'; 
 
-// Получаем все записи из базы данных
 $stmt = $pdo->query("SELECT * FROM contacts ORDER BY surname, name");
 $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     foreach ($contacts as $contact) {
-        // Проверяем, были ли изменения для каждой записи
+
         if (isset($_POST['surname_' . $contact['id']])) {
             $surname = $_POST['surname_' . $contact['id']];
             $name = $_POST['name_' . $contact['id']];
@@ -19,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $email = $_POST['email_' . $contact['id']];
             $comment = $_POST['comment_' . $contact['id']];
 
-            // Обновляем запись в базе данных
             $sql = "UPDATE contacts SET surname = ?, name = ?, lastname = ?, gender = ?, birthdate = ?, phone = ?, address = ?, email = ?, comment = ? WHERE id = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$surname, $name, $lastname, $gender, $birthdate, $phone, $address, $email, $comment, $contact['id']]);
