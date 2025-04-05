@@ -8,4 +8,5 @@
         "~^$~" => [src\Controllers\ArticleController::class, 'index'],
         "~^hello/(.*)$~" =>[src\Controllers\MainController::class, 'sayHello'],
         "~^bye/(.*)$~" =>[src\Controllers\MainController::class, 'sayBye'],
+        '#^article/(\d+)/comment$#' => [src\Controllers\CommentController::class, 'add'],
     ];

@@ -3,31 +3,38 @@
 use Exceptions\DbException;
 use Exceptions\NotFoundException;
 
-try{
-    spl_autoload_register(function(string $className){
-        require_once dirname(__DIR__).'\\'.$className.'.php';
-    });
 
-    
+define('BASE_PATH', '/php/Project/www');
+
+// Подключаем один автозагрузчик
+require __DIR__ . '/../src/autoload.php';
+
+$routerPath = __DIR__ . '/../src/Services/Router.php';
+if (!file_exists($routerPath)) {
+    die("Router.php not found at: {$routerPath}");
+}
+
+require $routerPath;
+
+try {
     $findRoute = false;
-    
     $route = $_GET['route'] ?? '';
-    // var_dump($route);
     $patterns = require 'route.php';
-    foreach ($patterns as $pattern=>$controllerAndAction){
+    
+    foreach ($patterns as $pattern => $controllerAndAction) {
         preg_match($pattern, $route, $matches);
-        if (!empty($matches)){
+        if (!empty($matches)) {
             $findRoute = true;
             unset($matches[0]);
             $nameController = $controllerAndAction[0];
             $actionName = $controllerAndAction[1];
-            $controller = new $nameController;
+            $controller = new $nameController();
             $controller->$actionName(...$matches);
             break;
         }
     }
     
-    if (!$findRoute) throw new Exceptions\NotFoundException();
+    if (!$findRoute) throw new NotFoundException();
 
 }catch(DbException $e){
     $view = new src\View\View(dirname(__DIR__).'/templates');
@@ -44,3 +51,6 @@ catch(NotFoundException $e){
 
     // var_dump($user);
     // var_dump($article);
+
+
+    
