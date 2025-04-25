@@ -1,41 +1,48 @@
 <?php
 require dirname(__DIR__) . '/header.php';
 ?>
-<table class="table">
-  <!-- Заголовки таблицы -->
-  <thead>
-    <tr>
-      <th scope="col">Id</th>
-      <th scope="col">Title</th>
-      <th scope="col">Text</th>
-      <th scope="col">Author</th>
-      <th scope="col">Actions</th> <!-- Новая колонка для действий -->
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($articles as $article): ?>
-      <tr>
-        <th scope="row"><?= htmlspecialchars($article->getId()) ?></th>
-        <td>
-          <a href="<?= BASE_PATH ?>/article/<?= $article->getId() ?>"><?= htmlspecialchars($article->getName()) ?></a>
-        </td>
-        <td><?= htmlspecialchars(mb_substr($article->getText(), 0, 50)) ?>...</td>
-        <td><?= htmlspecialchars($article->getAuthor()->getNickName()) ?></td>
-        <td>
-          <!-- Кнопка редактирования -->
-          <a href="/php/Project/www/article/<?= $article->getId() ?>/edit" class="btn btn-primary btn-sm">
-            Редактировать
-          </a>
+<div class="container mt-4">
+    <h1 class="mb-4">Список статей</h1>
+    
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
-          <!-- Кнопка удаления -->
-          <form action="/article/<?= $article->getId() ?>/delete" method="post" style="display: inline;">
-            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
-              Delete
-            </button>
-          </form>
-        </td>
-      </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-<?php require dirname(__DIR__) . '/footer.php'; ?>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Название</th>
+                <th scope="col">Текст</th>
+                <th scope="col">Автор</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($articles as $article): ?>
+                <tr>
+                    <th scope="row"><?= htmlspecialchars($article->getId()) ?></th>
+                    <td>
+                        <a href="<?= htmlspecialchars(dirname($_SERVER['SCRIPT_NAME']) . '/article/' . $article->getId()) ?>">
+                            <?= htmlspecialchars($article->getName()) ?>
+                        </a>
+                    </td>
+                    <td><?= htmlspecialchars(mb_strimwidth($article->getText(), 0, 100, '...')) ?></td>
+                    <td>
+                        <?php if ($article->getAuthor()): ?>
+                            <?= htmlspecialchars($article->getAuthor()->getNickname()) ?>
+                        <?php else: ?>
+                            <span class="text-muted">Неизвестен</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <?php if (empty($articles)): ?>
+        <div class="alert alert-info">Статьи не найдены</div>
+    <?php endif; ?>
+</div>
+<?php
+require dirname(__DIR__) . '/footer.php';
+?>

@@ -1,56 +1,31 @@
 <?php
 
-use Exceptions\DbException;
-use Exceptions\NotFoundException;
+spl_autoload_register(function(string $className) { // автозагрузка классов 
+    $filePath = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php'; // приписывает в конец ".php"
+    $fullPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . $filePath;
 
-
-define('BASE_PATH', '/php/Project/www');
-
-// Подключаем один автозагрузчик
-require __DIR__ . '/../src/autoload.php';
-
-$routerPath = __DIR__ . '/../src/Services/Router.php';
-if (!file_exists($routerPath)) {
-    die("Router.php not found at: {$routerPath}");
-}
-
-require $routerPath;
-
-try {
-    $findRoute = false;
-    $route = $_GET['route'] ?? '';
-    $patterns = require 'route.php';
-    
-    foreach ($patterns as $pattern => $controllerAndAction) {
-        preg_match($pattern, $route, $matches);
-        if (!empty($matches)) {
-            $findRoute = true;
-            unset($matches[0]);
-            $nameController = $controllerAndAction[0];
-            $actionName = $controllerAndAction[1];
-            $controller = new $nameController();
-            $controller->$actionName(...$matches);
-            break;
-        }
+    if (file_exists($fullPath)) {
+        require_once $fullPath;
+    } else {
+        throw new Exception("{$fullPath}");
     }
-    
-    if (!$findRoute) throw new NotFoundException();
+});
 
-}catch(DbException $e){
-    $view = new src\View\View(dirname(__DIR__).'/templates');
-    $view->renderHtml('errors/500', ['error'=>$e->getMessage()], 500);
+
+$findRoute = false;
+$route = $_GET['route'] ?? ''; // здесь получаем текущий маршрут нн
+
+$patterns = require 'route.php'; //подключение шаблонов 
+foreach ($patterns as $pattern => $controllerAndAction) { //перебор шаблонов
+    preg_match($pattern, $route, $matches); // проверка на совпадение регулярки с URL
+    if (!empty($matches)) { // если есть совпадение...
+        $findRoute = true;
+        unset($matches[0]); // полное совпадение
+        $controllerClass = $controllerAndAction[0]; 
+        $action = $controllerAndAction[1];  
+        $controller = new $controllerClass(); // создание объекта 
+        $controller->$action(...$matches); // для show(int $id) бдует передаваться только id
+        break;
+    }
 }
-catch(NotFoundException $e){
-    $view = new src\View\View(dirname(__DIR__).'/templates');
-    $view->renderHtml('errors/400', ['error'=>$e->getMessage()], 404);
-}
-
-
-    $user = new src\Models\Users\User('Ivan');
-    $article = new src\Models\Articles\Article('title', 'text', $user);
-
-    // var_dump($user);
-    // var_dump($article);
-
-
-    
+if (!$findRoute) echo "Page not found (404)"; // обрабатывает ошибки маршрутизации 

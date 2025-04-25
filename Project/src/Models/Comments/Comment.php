@@ -1,57 +1,66 @@
 <?php
+
 namespace src\Models\Comments;
 
 use src\Models\ActiveRecordEntity;
 use src\Models\Users\User;
-use src\Models\Articles\Article;
-use InvalidArgumentException;
+use src\Services\Db;
+use DateTime;
 
 class Comment extends ActiveRecordEntity
 {
+    protected $text;
     protected $authorId;
     protected $articleId;
-    protected $text;
     protected $createdAt;
-
-    public function getAuthor(): User
-    {
-        return User::getById($this->authorId);
-    }
-
-    public function getArticle(): Article
-    {
-        return Article::getById($this->articleId);
-    }
 
     public function getText(): string
     {
-        return $this->text;
+        return htmlspecialchars($this->text);
+    }
+
+    public function getAuthor(): User
+    {
+        return User::getById($this->authorId); // возвращение объекта User 
+    }
+
+    public function getArticleId(): int
+    {
+        return $this->articleId;
+    }
+
+    public function getCreatedAt(): string
+    {
+        $date = new DateTime($this->createdAt);
+        return $date->format('d.m.Y H:i');
     }
 
     public function setText(string $text): void
     {
-        if (empty(trim($text))) {
-            throw new InvalidArgumentException('Комментарий не может быть пустым');
-        }
-        $this->text = $text;
+        $this->text = trim($text); // обрезка пробелов в начале и конце строки 
     }
 
-    public static function createForArticle(int $articleId, array $fields, User $author): self
+    public function setAuthorId(int $authorId): void
     {
-        if (empty($fields['text'])) {
-            throw new InvalidArgumentException('Текст комментария обязателен');
-        }
-
-        $comment = new self();
-        $comment->setText($fields['text']);
-        $comment->articleId = $articleId;
-        $comment->authorId = $author->getId();
-        $comment->save();
-
-        return $comment;
+        $this->authorId = $authorId;
     }
 
-    protected static function getTableName(): string
+    public function setArticleId(int $articleId): void
+    {
+        $this->articleId = $articleId;
+    }
+
+    public static function findAllByArticleId(int $articleId): array //тут получаем все комментарии к статье
+    {
+        $db = Db::getInstance(); // подключение к БД посредством синглтона 
+        $sql = 'SELECT * FROM `'.static::getTableName().'` 
+                WHERE `article_id` = :article_id 
+                ORDER BY `created_at` DESC';
+        $result = $db->query($sql, [':article_id' => $articleId], static::class); // тут преобразуем резульат в объект класса Comment
+        return $result ?: [];
+    }
+
+    protected static function getTableName(): string // здесь мы указываем, с какой таблицей работает модель 
     {
         return 'comments';
     }

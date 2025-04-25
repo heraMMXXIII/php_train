@@ -1,71 +1,48 @@
 <?php
 namespace src\Controllers;
 
+use src\View\View;
 use src\Models\Comments\Comment;
 use src\Models\Articles\Article;
-use src\Exceptions\NotFoundException;
-use src\View\View;
 
 class CommentController
 {
     private $view;
 
-    public function __construct()
+    public function __construct() // Создается экземпляр класса View
     {
-        $this->view = new View(__DIR__ . '/../../templates');
+        $this->view = new View(dirname(dirname(__DIR__)).'/templates');
     }
 
-    public function add(int $articleId)
+    public function store(int $articleId)
     {
-        $article = Article::getById($articleId);
-        if (!$article) {
-            throw new NotFoundException('Статья не найдена');
-        }
-
-        // Получаем текущего пользователя (заглушка)
-        $author = User::getById(1); // Замените на реального пользователя
-
-        try {
-            $comment = Comment::createForArticle($articleId, $_POST, $author);
-            header("Location: /article/{$articleId}#comment-{$comment->getId()}");
-            exit();
-        } catch (InvalidArgumentException $e) {
-            $this->view->renderHtml('articles/show', [
-                'article' => $article,
-                'error' => $e->getMessage(),
-                'comments' => $article->getComments()
-            ]);
-        }
-    }
-
-    public function edit(int $commentId)
-    {
-        $comment = Comment::getById($commentId);
-        if (!$comment) {
-            throw new NotFoundException('Комментарий не найден');
-        }
-
-        // Здесь будет логика редактирования
-        $this->view->renderHtml('comments/edit', ['comment' => $comment]);
-    }
-    public function update()
-{
-    $comment = Comment::getById($_POST['id']);
-    if (!$comment) {
-        throw new NotFoundException();
-    }
-
-    try {
+        $comment = new Comment(); // создаем новый объект модели Comment
         $comment->setText($_POST['text']);
-        $comment->save();
-        
-        header("Location: /article/{$comment->getArticle()->getId()}#comment-{$comment->getId()}");
-        exit();
-    } catch (InvalidArgumentException $e) {
-        $this->view->renderHtml('comments/edit', [
+        $comment->setAuthorId(1); 
+        $comment->setArticleId($articleId);
+        $comment->save(); // сохраняем комментарий вызовом метода save() котрый реализован в ARE.php
+        $bUrl = dirname($_SERVER['SCRIPT_NAME']); 
+        header("Location: {$bUrl}/article/{$articleId}#comment{$comment->getId()}"); // редирект
+    }
+
+    public function edit(int $id)
+    {
+        $comment = Comment::getById($id); // тут получаем коммент по id
+        if (!$comment) {
+            throw new \Exception();
+        }
+        $this->view->renderHtml3('comment/edit.php', [
             'comment' => $comment,
-            'error' => $e->getMessage()
+            'error' => null
         ]);
     }
-}
+
+    public function update(int $id)
+    {
+        $comment = Comment::getById($id); 
+        $comment->setText($_POST['text']);
+        $comment->save();
+        $rUrl = dirname($_SERVER['SCRIPT_NAME']).'/article/'.$comment->getArticleId().'#comment'.$comment->getId();
+        header("Location: $rUrl");
+    }
 }
