@@ -53,7 +53,7 @@ class Comment extends ActiveRecordEntity
     public static function findAllByArticleId(int $articleId): array //тут получаем все комментарии к статье
     {
         $db = Db::getInstance(); // подключение к БД посредством синглтона 
-        $sql = 'SELECT * FROM `'.static::getTableName().'` 
+        $sql = 'SELECT * FROM `' . static::getTableName() . '` 
                 WHERE `article_id` = :article_id 
                 ORDER BY `created_at` DESC';
         $result = $db->query($sql, [':article_id' => $articleId], static::class); // тут преобразуем резульат в объект класса Comment

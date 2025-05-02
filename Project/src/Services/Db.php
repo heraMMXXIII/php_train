@@ -10,7 +10,7 @@ class Db
     {
         $dbOptions = require('settings.php');  // загрузка натсроек БД
         $this->pdo = new \PDO( // создаем объект PDO
-            'mysql:host='.$dbOptions['host'].';dbname='.$dbOptions['dbname'],
+            'mysql:host=' . $dbOptions['host'] . ';dbname=' . $dbOptions['dbname'],
             $dbOptions['user'],
             $dbOptions['password']
         );
@@ -19,17 +19,16 @@ class Db
 
     public function query(string $sql, array $params = [], string $className = 'stdClass'): array // запрос\массив праметров для запроса\в каком классе объекты будут
     {
-            $stmt = $this->pdo->prepare($sql); //pdo передает выражение
-            $stmt->execute($params); // подстановка параметров в запрос
-            $stmt->setFetchMode(\PDO::FETCH_CLASS, $className); // тут указываем PDO преобразовывать каждую строку в объект указанного класса
-            return $stmt->fetchAll(); // тут возвращаем массив объектов 
-        
+        $stmt = $this->pdo->prepare($sql); //pdo передает выражение
+        $stmt->execute($params); // подстановка параметров в запрос
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, $className); // тут указываем PDO преобразовывать каждую строку в объект указанного класса
+        return $stmt->fetchAll(); // тут возвращаем массив объектов 
     }
 
     public function getLastInsertId(): int // функция получения id последней записи 
     {
-        return (int)$this->pdo->lastInsertId(); // возвращаем id при полсденем insert
-     }
+        return (int) $this->pdo->lastInsertId(); // возвращаем id при полсденем insert
+    }
 
     public static function getInstance(): self // тут реализуем синглтон
     {

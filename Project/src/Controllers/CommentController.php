@@ -11,17 +11,17 @@ class CommentController
 
     public function __construct() // Создается экземпляр класса View
     {
-        $this->view = new View(dirname(dirname(__DIR__)).'/templates');
+        $this->view = new View(dirname(dirname(__DIR__)) . '/templates');
     }
 
     public function store(int $articleId)
     {
         $comment = new Comment(); // создаем новый объект модели Comment
         $comment->setText($_POST['text']);
-        $comment->setAuthorId(1); 
+        $comment->setAuthorId(1);
         $comment->setArticleId($articleId);
         $comment->save(); // сохраняем комментарий вызовом метода save() котрый реализован в ARE.php
-        $bUrl = dirname($_SERVER['SCRIPT_NAME']); 
+        $bUrl = dirname($_SERVER['SCRIPT_NAME']);
         header("Location: {$bUrl}/article/{$articleId}#comment{$comment->getId()}"); // редирект
     }
 
@@ -39,10 +39,10 @@ class CommentController
 
     public function update(int $id)
     {
-        $comment = Comment::getById($id); 
+        $comment = Comment::getById($id);
         $comment->setText($_POST['text']);
         $comment->save();
-        $rUrl = dirname($_SERVER['SCRIPT_NAME']).'/article/'.$comment->getArticleId().'#comment'.$comment->getId();
+        $rUrl = dirname($_SERVER['SCRIPT_NAME']) . '/article/' . $comment->getArticleId() . '#comment' . $comment->getId();
         header("Location: $rUrl");
     }
 }
