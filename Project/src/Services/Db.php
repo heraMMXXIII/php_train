@@ -24,12 +24,6 @@ class Db
         $stmt->setFetchMode(\PDO::FETCH_CLASS, $className); // тут указываем PDO преобразовывать каждую строку в объект указанного класса
         return $stmt->fetchAll(); // тут возвращаем массив объектов 
     }
-
-    public function getLastInsertId(): int // функция получения id последней записи 
-    {
-        return (int) $this->pdo->lastInsertId(); // возвращаем id при полсденем insert
-    }
-
     public static function getInstance(): self // тут реализуем синглтон
     {
         if (self::$instance === null) { //если экземпляров не было до этого, то создаем новый
